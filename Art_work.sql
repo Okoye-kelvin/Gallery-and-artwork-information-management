@@ -85,6 +85,9 @@ where prs.sale_price > prs.regular_price
 group by wrk.name;
 
 -- 13.	The Gallery_Hours table has one invalid entry. Identify and delete it. 
+Select *  From museum_hours;
+Update museum_hours
+set day = replace(day, 'Thusday', 'Thursday');
 
 -- 14. Display the 3 least common canvas sizes. 
 select  label, count (label) AS Popular_canvas_size from  Canvas_size
@@ -99,23 +102,13 @@ order by Most_work desc
 limit 5;
 
 -- 16. Which gallery is open the longest each day? Display gallery name, state, hours open, and which day.
-SELECT mus.name, mus.state, mush.day,
-       MIN(CAST(mush.open AS TIME)) AS open,
-       MAX(CAST(mush.close AS TIME)) AS close,
-       IFNULL(TIMESTAMPDIFF(MINUTE, MIN(CAST(mush.open AS TIME)), MAX(CAST(mush.close AS TIME))), 0) AS duration
-FROM museum mus
-JOIN museum_hours mush ON mus.museum_id = mush.museum_id
-GROUP BY mus.name, mus.state, mush.day
-ORDER BY duration DESC
-
-
-
-
-
-
-
-;
-select * from museum_hours;
+Select Mus.Name, Mus.State, Mush.Day, Min(Cast(Mush.Open As Time)) As Open,
+       Max(Cast(Mush.Close As Time)) As Close, Ifnull(Timestampdiff(Minute, 
+       Min(Cast(Mush.Open As Time)), Max(Cast(Mush.Close As Time))), 0) As Duration 
+       From Museum Mus Join Museum_Hours Mush 
+       On Mus.Museum_Id = Mush.Museum_Id 
+Group By Mus.Name, Mus.State, Mush.Day
+Order By Duration Desc;
 
 -- 17. List all the artworks that are not currently exhibited in any galleries.
 select wrk.name
@@ -185,13 +178,3 @@ group by  art.full_name,  pros.sale_price ,wrk.name ,mus.name,mus.city,cas.label
 order by Expensive Asc
 limit 5;
 
--- 22. Which artist has the most Portraits artworks outside the USA? Display artist name, number of 
--- artworks, and artist nationality
-select art.full_name, count(wrk.work_id) Num_artwork, art.nationality, count(sub.subject) Most_Portraits_artwork
-from artist art Join work wrk
-on art.artist_id = wrk.artist_id
-Join subject sub
-On sub.work_id = wrk.work_id 
-where sub.subject = 'Portraits' > 1
-group by art.full_name, art.nationality
-order by Most_Portraits_artwork Desc
